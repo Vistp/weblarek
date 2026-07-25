@@ -173,10 +173,10 @@ Presenter - презентер содержит основную логику п
 Методы класса:
 
 <!-- сохранение данных в модели -->
-`setPayment(payment: TPayment): void` - сохраняет выбранный вид оплаты
-`setAddress(address: string): void` - сохраняет введенный адрес доставки
-`setPhone(phone: string): void` - сохраняет введенный номер телефона
-`setEmail(email: string): void` - сохраняет введенную электронную почту
+`setPayment(payment: TPayment): void` - сохранение выбранного вида оплаты
+`setAddress(address: string): void` - сохранение введенного адреса доставки
+`setPhone(phone: string): void` - сохранение введенного номера телефона
+`setEmail(email: string): void` - сохранение введенной электронной почты
 `getData(): IBuyer` - получение всех данных покупателя
 `clearData(): void` - очистка данных покупателя
 `validate(): object` - валидация данных
