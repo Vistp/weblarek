@@ -132,7 +132,7 @@ Presenter - презентер содержит основную логику п
 `previewProduct: IProduct | null` - товар, выбранный для подробного отображения
 
 Методы класса:
-`setProducts(products: IProduct[]): void` - сохранение массива товаров полученного в параметрах метода
+`setProducts(products: IProduct[]): void` - сохранение массива товаров, полученного в параметрах метода
 `getProducts(): IProduct[]` - получение массива товаров из модели
 `getProductById(id: string): IProduct | undefined` - получение одного товара по его id
 `setPreviewProduct(product: IProduct): void` - сохранение товара для подробного отображения
@@ -155,7 +155,7 @@ Presenter - презентер содержит основную логику п
 `clear(): void` - очистка корзины
 `getTotalPrice(): number` - получение стоимости всех товаров в корзине
 `getItemsCount(): number` - получение количества товаров в корзине
-`checkInCart(id: string): boolean` - ппроверка наличия товара в корзине по его id, полученного в параметр метода
+`checkInCart(id: string): boolean` - проверка наличия товара в корзине по его id, полученного в параметр метода
 
 
 #### Класс Покупатель Buyer
