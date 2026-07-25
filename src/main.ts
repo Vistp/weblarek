@@ -12,6 +12,7 @@ const buyer = new Buyer();
 
 
 /** Каталог товаров */
+console.log("***Каталог товаров***");
 
 catalog.setProducts(apiProducts.items); // Cохранение массива товаров, полученного в параметрах метода
 console.log('Получение массива товаров из модели:', catalog.getProducts());
@@ -19,7 +20,28 @@ console.log('Получение массива товаров из модели:
 const productItemId = apiProducts.items[0].id;
 console.log('Получение одного товара по его id', catalog.getProductById(productItemId));
 
-const productItemForPreview = apiProducts.items[0];
+const productItemForPreview = apiProducts.items[0]; // TODO: пеерменную вынести наверх
 catalog.setPreviewProduct(productItemForPreview); // Cохранение товара для подробного отображения
 
 console.log('получение товара для подробного отображения:', catalog.getPreviewProduct());
+
+
+/** Корзина товаров */
+console.log("***Корзина товаров***");
+
+console.log('Получение массива товаров, которые находятся в корзине:', cart.getItems());
+
+cart.add(productItemForPreview); // Добавление товара, который был получен в параметре, в массив корзины
+console.log(`Проверка наличия товара в корзине с id ${productItemForPreview.id} после добавления:`, cart.checkInCart(productItemForPreview.id));
+
+cart.remove(productItemForPreview.id); // Удаление товара, полученного в параметре из массива корзины
+console.log(`Проверка наличия товара в корзине с id ${productItemForPreview.id} после удаления:`, cart.checkInCart(productItemForPreview.id));
+
+console.log('Добавление в корзину товара и проверка до очистки корзины');
+cart.add(productItemForPreview);
+console.log('Получение массива товаров, которые находятся в корзине:', cart.getItems());
+cart.clear(); // Очистка корзины
+
+console.log('Проверка после очистки корзины');
+console.log('Получение стоимости всех товаров в корзине', cart.getTotalPrice());
+console.log('Получение количества товаров в корзине', cart.getItemsCount());
