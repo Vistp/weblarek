@@ -2,7 +2,7 @@ import { IProduct } from "../../types";
 
 /** Класс Корзина товаров */
 export class Cart {
-  items: IProduct[] = [];
+  private items: IProduct[] = [];
 
   constructor() {}
 

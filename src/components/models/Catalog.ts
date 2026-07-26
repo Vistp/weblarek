@@ -2,8 +2,8 @@ import { IProduct } from "../../types";
 
 /** Класс Каталог товаров */
 export class Catalog {
-  products: IProduct[] = [];
-  previewProduct: IProduct | null = null;
+  private products: IProduct[] = [];
+  private previewProduct: IProduct | null = null;
 
   constructor() {}
 

@@ -75,9 +75,13 @@ console.log("***Взаимодействие с API***");
 const api = new Api(API_URL);
 const serverConnector = new ServerConnector(api);
 
-serverConnector.getProducts().then((data) => {
-  console.log('Ответ от сервера с массивом товаров:', data);
+serverConnector.getProducts()
+  .then((data) => {
+    console.log('Ответ от сервера с массивом товаров:', data);
 
-  catalog.setProducts(data.items); // Cохранение массива товаров, полученного в параметрах метода
-  console.log('Получение массива товаров из модели после сохранения:', catalog.getProducts());
+    catalog.setProducts(data.items); // Cохранение массива товаров, полученного в параметрах метода
+    console.log('Получение массива товаров из модели после сохранения:', catalog.getProducts());
   })
+  .catch((error) => {
+    console.error('Ошибка при получении товаров с сервера:', error);
+  });

@@ -26,6 +26,9 @@ export interface IBuyer {
 /** Способ оплаты */
 export type TPayment = 'card' | 'cash' | '';
 
+/** Ошибки валидации */
+export type TErrors = Partial<Record<keyof IBuyer, string>>;
+
 
 /** Ответ сервера при запросе списка товаров */
 export interface IProductResponse {
