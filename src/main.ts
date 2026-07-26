@@ -2,7 +2,7 @@ import { Api } from './components/base/Api';
 import { Buyer } from './components/models/Buyer';
 import { Cart } from './components/models/Cart';
 import { Catalog } from './components/models/Catalog';
-import { ServerConnector } from './components/models/ServerConnector';
+import { ServerConnector } from './components/ServerConnector';
 import './scss/styles.scss';
 import { API_URL } from './utils/constants';
 import { apiProducts } from './utils/data';

@@ -1,5 +1,5 @@
-import { IOrder, IOrderResult, IProductResponse } from "../../types";
-import { Api } from "../base/Api";
+import { IOrder, IOrderResult, IProductResponse } from "../types";
+import { Api } from "./base/Api";
 
 /** Класс ServerConnector */
 export class ServerConnector {
