@@ -1,11 +1,10 @@
-import { IOrder, IOrderResult, IProductResponse } from "../types";
-import { Api } from "./base/Api";
+import { IOrder, IOrderResult, IProductResponse, IApi } from "../types";
 
 /** Класс ServerConnector */
 export class ServerConnector {
-  protected _api: Api;
+  protected _api: IApi;
 
-  constructor(api: Api) {
+  constructor(api: IApi) {
     this._api = api;
   }
 
