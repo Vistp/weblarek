@@ -233,7 +233,7 @@ Presenter - презентер содержит основную логику п
 Конструктор: `constructor(container: HTMLElement)` - принимает контейнер карточки
 
 Поля класса:
-`titleElement: HTMLElement` - заголовк товара
+`titleElement: HTMLElement` - заголовок товара
 `priceElement: HTMLElement` - цена товара
 
 Методы:

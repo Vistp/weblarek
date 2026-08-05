@@ -49,3 +49,60 @@ export interface IOrderResult {
 /** Сумма покупки, подтвержденная сервером после проведения оплаты */
   total: number;
 }
+
+/** Счетчик товаров в шапке сайта */
+export interface IHeaderState {
+  counter: number;
+}
+
+/** Каталог товаров */
+export interface IGalleryState {
+  catalog: HTMLElement[];
+}
+
+/** Интерфейсы карточек товаров */
+
+/** Карточка товара (базовый класс) */
+export interface ICardState {
+  title: string;
+  price: number | null;
+}
+
+/** Карточка каталога */
+export interface ICardCatalogState extends ICardState {
+  category: string;
+  image: string;
+}
+
+/** Карточка подробного просмотра */
+export interface ICardPreviewState extends ICardState {
+  category: string;
+  image: string;
+  text: string;
+  buttonText: string;
+}
+
+/** Интерфейсы форм */
+
+/** Форма (базовый класс) */
+export interface IFormState {
+  valid: boolean;
+  errors: string;
+}
+
+/** Форма доставки */
+export interface IOrderFormState extends IFormState {
+  payment: string;
+  address: string;
+}
+
+/** Форма контактов */
+export interface IContactsFormState extends IFormState {
+  email: string;
+  phone: string;
+}
+
+/** Модальное окно */
+export interface IModalState {
+  content: HTMLElement;
+}
