@@ -166,11 +166,51 @@ events.on('contacts:input-changed', (data: { field: string; value: string }) => 
   } else if (data.field === 'phone') {
     buyer.setPhone(data.value);
   }
+
+  const formElement = modalContainer.querySelector('form[name="contacts"]') as HTMLFormElement;
+  if (formElement) {
+    const contactsForm = new ContactsForm(formElement, events);
+    const errors = buyer.validate();
+
+    contactsForm.valid = !errors.email && !errors.phone;
+  }
 });
 
 /** Нажатие кнопки оплаты/завершения оформления заказа */
 events.on('contacts:submit', () => {
-  //
+  const orderData = {
+    ...buyer.getData(),
+    items: cart.getItems().map(item => item.id),
+    total: cart.getTotalPrice()
+  };
+
+  serverConnector.postOrder(orderData)
+    .then((result) => {
+      const successTemplate = document.querySelector('#success') as HTMLTemplateElement;
+      const successFragment = successTemplate.content.cloneNode(true) as DocumentFragment;
+      const successContainer = successFragment.firstElementChild as HTMLElement;
+
+      const descriptionElement = successContainer.querySelector('.order-success__description') as HTMLElement;
+      const closeButton = successContainer.querySelector('.order-success__close') as HTMLButtonElement;
+
+      if (descriptionElement) {
+        descriptionElement.textContent = `Списано ${result.total} синапсов`;
+      }
+
+      if (closeButton) {
+        closeButton.addEventListener('click', () => {
+          modal.close();
+        });
+      }
+
+      modal.content = successContainer;
+
+      cart.clear();
+      buyer.clearData();
+    })
+    .catch((error) => {
+      console.error('Ошибка при отправке заказа:', error);
+    });
 });
 
 serverConnector.getProducts()
