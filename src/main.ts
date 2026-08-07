@@ -9,8 +9,9 @@ import { CardCatalog } from './components/view/CardCatalog';
 import { CardPreview } from './components/view/CardPreview';
 import { Header } from './components/view/Header';
 import { Modal } from './components/view/Modal';
+import { OrderForm } from './components/view/OrderForm';
 import './scss/styles.scss';
-import { IProduct } from './types';
+import { IProduct, TPayment } from './types';
 import { API_URL } from './utils/constants';
 
 const events = new EventEmitter();
@@ -104,6 +105,52 @@ events.on('basket:open', () => {
   modal.open();
 });
 
+/** Нажатие кнопки оформления заказа */
+events.on('order:open', () => {
+  buyer.clearData();
+
+  const orderTemplate = document.querySelector('#order') as HTMLTemplateElement;
+  const orderFragment = orderTemplate.content.cloneNode(true) as DocumentFragment;
+  const orderContainer = orderFragment.firstElementChild as HTMLFormElement;
+
+  const orderForm = new OrderForm(orderContainer, events);
+
+  modal.content = orderForm.render();
+});
+
+/** Изменение способа оплаты */
+events.on('order:payment-changed', (data: { method: TPayment }) => {
+  buyer.setPayment(data.method);
+
+  const formElement = modalContainer.querySelector('form[name="order"]') as HTMLFormElement;
+  if (formElement) {
+    const orderForm = new OrderForm(formElement, events);
+    const errors = buyer.validate();
+    orderForm.valid = !errors.payment && !errors.address;
+    orderForm.errors = errors.payment || errors.address || '';
+    orderForm.payment = data.method;
+  }
+});
+
+/** Изменение адреса доставки */
+events.on('order:input-changed', (data: { field: string; value: string }) => {
+  if (data.field === 'address') {
+    buyer.setAddress(data.value);
+
+    const formElement = modalContainer.querySelector('form[name="order"]') as HTMLFormElement;
+    if (formElement) {
+      const orderForm = new OrderForm(formElement, events);
+      const errors = buyer.validate();
+      orderForm.valid = !errors.payment && !errors.address;
+      orderForm.errors = errors.payment || errors.address || '';
+    }
+  }
+});
+
+/** Нажатие кнопки перехода ко второй форме оформления заказа */
+events.on('order:submit', () => {
+  events.emit('contacts:open');
+});
 
 serverConnector.getProducts()
   .then((data) => {
