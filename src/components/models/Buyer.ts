@@ -1,4 +1,5 @@
 import { IBuyer, TErrors, TPayment } from "../../types";
+import { IEvents } from "../base/Events";
 
 /** Класс Покупатель */
 export class Buyer {
@@ -7,22 +8,26 @@ export class Buyer {
   private phone: string = '';
   private email: string = '';
 
-  constructor() {}
+  constructor(protected events: IEvents) {}
 
   setPayment(payment: TPayment): void {
     this.payment = payment;
+    this.events.emit('buyer:payment-changed', this.validate());
   }
 
   setAddress(address: string): void {
     this.address = address;
+    this.events.emit('buyer:address-changed', this.validate());
   }
 
   setPhone(phone: string): void {
     this.phone = phone;
+    this.events.emit('buyer:phone-changed', this.validate());
   }
 
   setEmail(email: string): void {
     this.email = email;
+    this.events.emit('buyer:email-changed', this.validate());
   }
 
   getData(): IBuyer {
@@ -39,6 +44,7 @@ export class Buyer {
     this.address = '';
     this.phone = '';
     this.email = '';
+    this.events.emit('buyer:clear', this.validate());
   }
 
   validate(): TErrors {
