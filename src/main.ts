@@ -7,6 +7,7 @@ import { ServerConnector } from './components/ServerConnector';
 import { CardBasket } from './components/view/CardBasket';
 import { CardCatalog } from './components/view/CardCatalog';
 import { CardPreview } from './components/view/CardPreview';
+import { ContactsForm } from './components/view/ContactsForm';
 import { Header } from './components/view/Header';
 import { Modal } from './components/view/Modal';
 import { OrderForm } from './components/view/OrderForm';
@@ -149,7 +150,27 @@ events.on('order:input-changed', (data: { field: string; value: string }) => {
 
 /** Нажатие кнопки перехода ко второй форме оформления заказа */
 events.on('order:submit', () => {
-  events.emit('contacts:open');
+  const contactsTemplate = document.querySelector('#contacts') as HTMLTemplateElement;
+  const contactsFragment = contactsTemplate.content.cloneNode(true) as DocumentFragment;
+  const contactsContainer = contactsFragment.firstElementChild as HTMLFormElement;
+
+  const contactsForm = new ContactsForm(contactsContainer, events);
+
+  modal.content = contactsForm.render();
+});
+
+/** Изменение данных формы email и телефон */
+events.on('contacts:input-changed', (data: { field: string; value: string }) => {
+  if (data.field === 'email') {
+    buyer.setEmail(data.value);
+  } else if (data.field === 'phone') {
+    buyer.setPhone(data.value);
+  }
+});
+
+/** Нажатие кнопки оплаты/завершения оформления заказа */
+events.on('contacts:submit', () => {
+  //
 });
 
 serverConnector.getProducts()
