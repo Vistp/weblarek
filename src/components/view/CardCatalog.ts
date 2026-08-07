@@ -1,4 +1,4 @@
-import { ICardCatalogState } from "../../types";
+import { ICardActions, ICardCatalogState } from "../../types";
 import { categoryMap } from "../../utils/constants";
 import { Card } from "./Card";
 
@@ -7,14 +7,19 @@ export class CardCatalog extends Card {
   protected categoryElement: HTMLElement;
   protected imageElement: HTMLImageElement;
 
-  constructor(container: HTMLElement) {
+  constructor(container: HTMLElement, actions?: ICardActions) {
     super(container);
+
     this.categoryElement = container.querySelector(
       ".card__category",
     ) as HTMLElement;
     this.imageElement = container.querySelector(
       ".card__image",
     ) as HTMLImageElement;
+
+    if (actions?.onClick) {
+      this.container.addEventListener("click", actions.onClick);
+    }
   }
 
   set category(value: string) {
