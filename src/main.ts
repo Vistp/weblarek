@@ -4,6 +4,7 @@ import { Buyer } from './components/models/Buyer';
 import { Cart } from './components/models/Cart';
 import { Catalog } from './components/models/Catalog';
 import { ServerConnector } from './components/ServerConnector';
+import { CardBasket } from './components/view/CardBasket';
 import { CardCatalog } from './components/view/CardCatalog';
 import { CardPreview } from './components/view/CardPreview';
 import { Header } from './components/view/Header';
@@ -77,6 +78,33 @@ events.on('preview:changed', (product: IProduct) => {
   modal.open();
 });
 
+/** Нажатие кнопки покупки товара */
+events.on('card:add-to-cart', (product: IProduct) => {
+  if (!cart.checkInCart(product.id)) {
+    cart.add(product);
+  }
+  modal.close();
+});
+
+
+/** Изменение содержимого корзины */
+events.on('basket:changed', () => {
+  header.counter = cart.getItemsCount();
+
+  const currentModalContent = modalContainer.querySelector('.basket');
+
+  if (currentModalContent) {
+    renderBasket();
+  }
+});
+
+/** Нажатие кнопки открытия корзины */
+events.on('basket:open', () => {
+  renderBasket();
+  modal.open();
+});
+
+
 serverConnector.getProducts()
   .then((data) => {
     catalog.setProducts(data.items);
@@ -84,3 +112,49 @@ serverConnector.getProducts()
   .catch((error) => {
     console.error('Ошибка при получении товаров с сервера:', error);
   });
+
+
+/**
+ * Отрисовка содержимого корзины
+ */
+const renderBasket = () => {
+  const basketTemplate = document.querySelector('#basket') as HTMLTemplateElement;
+  const basketFragment = basketTemplate.content.cloneNode(true) as DocumentFragment;
+  const basketContainer = basketFragment.firstElementChild as HTMLElement;
+
+  const basketListElement = basketContainer.querySelector('.basket__list') as HTMLElement;
+  const basketPriceElement = basketContainer.querySelector('.basket__price') as HTMLElement;
+  const basketButton = basketContainer.querySelector('.basket__button') as HTMLButtonElement;
+
+  const items = cart.getItems();
+
+  const itemsList = items.map((product, index) => {
+    const itemTemplate = document.querySelector('#card-basket') as HTMLTemplateElement;
+    const itemFragment = itemTemplate.content.cloneNode(true) as DocumentFragment;
+    const itemContainer = itemFragment.firstElementChild as HTMLElement;
+
+    const cardBasket = new CardBasket(itemContainer, {
+      onDelete: () => {
+        cart.remove(product.id);
+      }
+    });
+
+    cardBasket.title = product.title;
+    cardBasket.price = product.price;
+    cardBasket.index = index + 1;
+
+    return cardBasket.render();
+  });
+
+  basketListElement.replaceChildren(...itemsList);
+  basketPriceElement.textContent = `${cart.getTotalPrice()} синапсов`;
+
+  if (basketButton) {
+    basketButton.disabled = items.length === 0;
+    basketButton.addEventListener('click', () => {
+      events.emit('order:open');
+    });
+  }
+
+  modal.content = basketContainer;
+};
