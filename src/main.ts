@@ -13,7 +13,7 @@ import { Modal } from './components/view/Modal';
 import { OrderForm } from './components/view/OrderForm';
 import './scss/styles.scss';
 import { IProduct, TPayment } from './types';
-import { API_URL } from './utils/constants';
+import { API_URL, CDN_URL } from './utils/constants';
 
 const events = new EventEmitter();
 const api = new Api(API_URL);
@@ -48,7 +48,7 @@ events.on('items:changed', () => {
     card.title = product.title;
     card.price = product.price;
     card.category = product.category;
-    card.image = product.image;
+    card.image = `${CDN_URL}${product.image}`;
 
     return card.render();
   });
@@ -65,16 +65,26 @@ events.on('preview:changed', (product: IProduct) => {
   const cardPreview = new CardPreview(cardPreviewContainer, {
     onClick: () => {},
     onAction: () => {
-      events.emit('card:add-to-cart', product);
+      if (cart.checkInCart(product.id)) {
+        cart.remove(product.id);
+      } else {
+        if (product.price !== null) {
+          cart.add(product);
+        }
+      }
+      modal.close();
     }
   });
 
   cardPreview.title = product.title;
   cardPreview.price = product.price;
   cardPreview.category = product.category;
-  cardPreview.image = product.image;
+  cardPreview.image = `${CDN_URL}${product.image}`;
   cardPreview.text = product.description;
-  cardPreview.buttonText = 'В корзину';
+
+  if (product.price !== null) {
+    cardPreview.buttonText = cart.checkInCart(product.id) ? 'Удалить из корзины' : 'В корзину';
+  }
 
   modal.content = cardPreview.render();
   modal.open();

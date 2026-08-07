@@ -23,10 +23,6 @@ export class CardPreview extends Card {
       ".card__button",
     ) as HTMLButtonElement;
 
-    if (actions?.onClick) {
-      this.container.addEventListener("click", actions.onClick);
-    }
-
     if (actions?.onAction && this.actionButton) {
       this.actionButton.addEventListener("click", (event) => {
         event.stopPropagation();
@@ -35,12 +31,23 @@ export class CardPreview extends Card {
     }
   }
 
+  set price(value: number | null) {
+    if (this.priceElement) {
+      this.priceElement.textContent = value === null ? "" : `${value} синапсов`;
+    }
+
+    if (value === null && this.actionButton) {
+      this.actionButton.disabled = true;
+      this.actionButton.textContent = "Недоступно";
+    }
+  }
+
   set category(value: string) {
     if (this.categoryElement) {
       this.categoryElement.textContent = value;
       this.categoryElement.className = "card__category";
-      const сlassName = categoryMap[value as keyof typeof categoryMap] || "card__category_other";
-      this.categoryElement.classList.add(сlassName);
+      const categoryClass = categoryMap[value as keyof typeof categoryMap] || "card__category_other";
+      this.categoryElement.classList.add(categoryClass);
     }
   }
 
@@ -61,7 +68,7 @@ export class CardPreview extends Card {
   }
 
   set buttonText(value: string) {
-    if (this.actionButton) {
+    if (this.actionButton && this.actionButton.textContent !== "Недоступно") {
       this.actionButton.textContent = value;
     }
   }
