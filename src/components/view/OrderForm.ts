@@ -1,4 +1,5 @@
 import { IOrderFormState } from "../../types";
+import { IEvents } from "../base/Events";
 import { Form } from "./Form";
 
 /** Класс Форма доставки */
@@ -7,8 +8,9 @@ export class OrderForm extends Form<IOrderFormState> {
   protected cashPayButton: HTMLButtonElement;
   protected addressInput: HTMLInputElement;
 
-  constructor(container: HTMLFormElement) {
-    super(container);
+  constructor(container: HTMLFormElement, events: IEvents) {
+    super(container, events);
+
     this.cardPayButton = container.querySelector(
       'button[name="card"]',
     ) as HTMLButtonElement;
@@ -18,6 +20,14 @@ export class OrderForm extends Form<IOrderFormState> {
     this.addressInput = container.querySelector(
       'input[name="address"]',
     ) as HTMLInputElement;
+
+    this.cardPayButton?.addEventListener("click", () => {
+      this.events.emit("order:payment-changed", { method: "card" });
+    });
+
+    this.cashPayButton?.addEventListener("click", () => {
+      this.events.emit("order:payment-changed", { method: "cash" });
+    });
   }
 
   set payment(value: string) {

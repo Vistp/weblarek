@@ -106,3 +106,20 @@ export interface IContactsFormState extends IFormState {
 export interface IModalState {
   content: HTMLElement;
 }
+
+/** Действия для карточек товаров*/
+
+/** Действия для карточки в каталоге товаров */
+export interface ICardActions {
+  onClick: (event: MouseEvent) => void;
+}
+
+/** Действия для карточки подробного просмотра */
+export interface ICardPreviewActions extends ICardActions {
+  onAction: (event: MouseEvent) => void;
+}
+
+/** Действия для карточки в корзине */
+export interface ICardBasketActions {
+  onDelete: (event: MouseEvent) => void;
+}

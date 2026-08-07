@@ -1,4 +1,4 @@
-import { ICardPreviewState } from "../../types";
+import { ICardPreviewState, ICardPreviewActions } from "../../types";
 import { categoryMap } from "../../utils/constants";
 import { Card } from "./Card";
 
@@ -9,8 +9,9 @@ export class CardPreview extends Card {
   protected textElement: HTMLElement;
   protected actionButton: HTMLButtonElement;
 
-  constructor(container: HTMLElement) {
+  constructor(container: HTMLElement, actions?: ICardPreviewActions) {
     super(container);
+
     this.categoryElement = container.querySelector(
       ".card__category",
     ) as HTMLElement;
@@ -21,16 +22,25 @@ export class CardPreview extends Card {
     this.actionButton = container.querySelector(
       ".card__button",
     ) as HTMLButtonElement;
+
+    if (actions?.onClick) {
+      this.container.addEventListener("click", actions.onClick);
+    }
+
+    if (actions?.onAction && this.actionButton) {
+      this.actionButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        actions.onAction(event);
+      });
+    }
   }
 
   set category(value: string) {
     if (this.categoryElement) {
       this.categoryElement.textContent = value;
       this.categoryElement.className = "card__category";
-      const categoryClass =
-        categoryMap[value as keyof typeof categoryMap] ||
-        "card__category_other";
-        this.categoryElement.classList.add(categoryClass);
+      const сlassName = categoryMap[value as keyof typeof categoryMap] || "card__category_other";
+      this.categoryElement.classList.add(сlassName);
     }
   }
 

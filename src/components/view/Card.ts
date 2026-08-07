@@ -1,4 +1,4 @@
-import { ICardState } from "../../types";
+import { ICardState} from "../../types";
 import { Component } from "../base/Component";
 
 /** Базовый класс Карточка товара */
@@ -8,7 +8,6 @@ export class Card extends Component<ICardState> {
 
   constructor(container: HTMLElement) {
     super(container);
-
     this.titleElement = container.querySelector(".card__title") as HTMLElement;
     this.priceElement = container.querySelector(".card__price") as HTMLElement;
   }
