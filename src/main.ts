@@ -129,6 +129,11 @@ events.on('basket:changed', () => {
   updateBasketData();
 });
 
+/** Удаление товара из корзины */
+events.on('basket:remove-item', (product: IProduct) => {
+  cart.remove(product.id);
+});
+
 /** Нажатие кнопки открытия корзины */
 events.on('basket:open', () => {
   updateBasketData();
@@ -247,8 +252,8 @@ function updateBasketData() {
     const itemContainer = itemFragment.firstElementChild as HTMLElement;
 
     const cardBasket = new CardBasket(itemContainer, {
-      onDelete: () => {
-        cart.remove(product.id);
+       onDelete: () => {
+        events.emit('basket:remove-item', product);
       }
     });
 
