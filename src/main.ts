@@ -110,7 +110,7 @@ events.on('card:add-to-cart', (product: IProduct) => {
   modal.close();
 });
 
-/**Нажатие кнопки удаления из корзины из окна просмотра товара */
+/** Нажатие кнопки удаления из корзины из окна просмотра товара */
 events.on('preview:toggle-cart', (product: IProduct) => {
   if (cart.checkInCart(product.id)) {
     cart.remove(product.id);
@@ -158,23 +158,12 @@ events.on('order:open', () => {
 /** Изменение способа оплаты */
 events.on('order:payment-changed', (data: { method: TPayment }) => {
   buyer.setPayment(data.method);
-
-  const errors = buyer.validate();
-
-  orderForm.valid = !errors.payment && !errors.address;
-  orderForm.errors = errors.payment || errors.address || '';
-  orderForm.payment = data.method;
 });
 
 /** Изменение адреса доставки */
 events.on('order:input-changed', (data: { field: string; value: string }) => {
   if (data.field === 'address') {
     buyer.setAddress(data.value);
-
-    const errors = buyer.validate();
-
-    orderForm.valid = !errors.payment && !errors.address;
-    orderForm.errors = errors.payment || errors.address || '';
   }
 });
 
@@ -195,9 +184,20 @@ events.on('contacts:input-changed', (data: { field: string; value: string }) => 
   } else if (data.field === 'phone') {
     buyer.setPhone(data.value);
   }
+});
 
+/** Изменение любых данных покупателя в модели */
+events.on('buyer:changed', () => {
+  const currentData = buyer.getData();
   const errors = buyer.validate();
 
+  orderForm.payment = currentData.payment || '';
+  orderForm.address = currentData.address || '';
+  orderForm.valid = !errors.payment && !errors.address;
+  orderForm.errors = errors.payment || errors.address || '';
+
+  contactsForm.email = currentData.email || '';
+  contactsForm.phone = currentData.phone || '';
   contactsForm.valid = !errors.email && !errors.phone;
   contactsForm.errors = errors.email || errors.phone || '';
 });
