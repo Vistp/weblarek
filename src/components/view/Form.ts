@@ -45,4 +45,10 @@ export class Form<T extends IFormState = IFormState> extends Component<T> {
       this.errorElement.textContent = value;
     }
   }
+
+  clear(): void {
+    if (this.container instanceof HTMLFormElement) {
+      this.container.reset();
+    }
+  }
 }

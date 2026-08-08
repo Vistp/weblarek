@@ -214,6 +214,12 @@ events.on('contacts:submit', () => {
     });
 });
 
+/** Закрытие модального окна */
+events.on('modal:close', () => {
+  orderForm.clear();
+  contactsForm.clear();
+});
+
 /** Закрытие окна успешного заказа */
 events.on('success:close', () => {
   modal.close();
