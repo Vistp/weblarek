@@ -14,6 +14,8 @@ import { Success } from './components/view/Success';
 import './scss/styles.scss';
 import { IProduct, TPayment } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
+import { OrderForm } from './components/view/OrderForm';
+import { ContactsForm } from './components/view/ContactsForm';
 
 const events = new EventEmitter();
 const api = new Api(API_URL);
@@ -29,15 +31,21 @@ const modalContainer = document.querySelector('#modal-container') as HTMLElement
 
 const basketTemplate = document.querySelector('#basket') as HTMLTemplateElement;
 const successTemplate = document.querySelector('#success') as HTMLTemplateElement;
+const orderTemplate = document.querySelector('#order') as HTMLTemplateElement;
+const contactsTemplate = document.querySelector('#contacts') as HTMLTemplateElement;
 
 const basketContainer = (basketTemplate.content.cloneNode(true) as DocumentFragment).firstElementChild as HTMLElement;
 const successContainer = (successTemplate.content.cloneNode(true) as DocumentFragment).firstElementChild as HTMLElement;
+const orderContainer = (orderTemplate.content.cloneNode(true) as DocumentFragment).firstElementChild as HTMLFormElement;
+const contactsContainer = (contactsTemplate.content.cloneNode(true) as DocumentFragment).firstElementChild as HTMLFormElement;
 
 
 const header = new Header(headerContainer, events);
 const modal = new Modal(modalContainer, events);
 const basket = new Basket(basketContainer, events);
 const success = new Success(successContainer, events);
+const orderForm = new OrderForm(orderContainer, events);
+const contactsForm = new ContactsForm(contactsContainer, events);
 
 /** Изменение каталога товаров */
 events.on('items:changed', () => {
@@ -130,36 +138,46 @@ events.on('basket:open', () => {
 events.on('order:open', () => {
   buyer.clearData();
 
-  // const orderTemplate = document.querySelector('#order') as HTMLTemplateElement;
-  // const orderFragment = orderTemplate.content.cloneNode(true) as DocumentFragment;
-  // const orderContainer = orderFragment.firstElementChild as HTMLFormElement;
+  const errors = buyer.validate();
 
-  // const orderForm = new OrderForm(orderContainer, events);
+  orderForm.valid = !errors.payment && !errors.address;
+  orderForm.errors = errors.payment || errors.address || '';
+  orderForm.payment = '';
 
-  // modal.content = orderForm.render();
+  modal.content = orderForm.render();
 });
 
 /** Изменение способа оплаты */
 events.on('order:payment-changed', (data: { method: TPayment }) => {
   buyer.setPayment(data.method);
+
+  const errors = buyer.validate();
+
+  orderForm.valid = !errors.payment && !errors.address;
+  orderForm.errors = errors.payment || errors.address || '';
+  orderForm.payment = data.method;
 });
 
 /** Изменение адреса доставки */
 events.on('order:input-changed', (data: { field: string; value: string }) => {
   if (data.field === 'address') {
     buyer.setAddress(data.value);
+
+    const errors = buyer.validate();
+
+    orderForm.valid = !errors.payment && !errors.address;
+    orderForm.errors = errors.payment || errors.address || '';
   }
 });
 
 /** Нажатие кнопки перехода ко второй форме оформления заказа */
 events.on('order:submit', () => {
-  // const contactsTemplate = document.querySelector('#contacts') as HTMLTemplateElement;
-  // const contactsFragment = contactsTemplate.content.cloneNode(true) as DocumentFragment;
-  // const contactsContainer = contactsFragment.firstElementChild as HTMLFormElement;
+  const errors = buyer.validate();
 
-  // const contactsForm = new ContactsForm(contactsContainer, events);
+  contactsForm.valid = !errors.email && !errors.phone;
+  contactsForm.errors = errors.email || errors.phone || '';
 
-  // modal.content = contactsForm.render();
+  modal.content = contactsForm.render();
 });
 
 /** Изменение данных формы email и телефон */
@@ -169,6 +187,11 @@ events.on('contacts:input-changed', (data: { field: string; value: string }) => 
   } else if (data.field === 'phone') {
     buyer.setPhone(data.value);
   }
+
+  const errors = buyer.validate();
+
+  contactsForm.valid = !errors.email && !errors.phone;
+  contactsForm.errors = errors.email || errors.phone || '';
 });
 
 /** Нажатие кнопки оплаты/завершения оформления заказа */
