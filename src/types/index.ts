@@ -107,6 +107,18 @@ export interface IModalState {
   content: HTMLElement;
 }
 
+/** Корзина товаров */
+export interface IBasketState {
+  items: HTMLElement[];
+  total: number;
+}
+
+/** Успешный заказ */
+export interface ISuccessState {
+  total: number;
+}
+
+
 /** Действия для карточек товаров*/
 
 /** Действия для карточки в каталоге товаров */
