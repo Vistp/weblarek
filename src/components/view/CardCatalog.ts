@@ -1,4 +1,4 @@
-import { ICardActions, ICardCatalogState } from "../../types";
+import { ICardActions} from "../../types";
 import { categoryMap } from "../../utils/constants";
 import { Card } from "./Card";
 
@@ -33,17 +33,12 @@ export class CardCatalog extends Card {
     }
   }
 
-  set image(value: string) {
-    if (this.imageElement) {
+  set image(value: { src: string; alt: string }) {
+    if (this.imageElement && value) {
       this.setImage(
-      this.imageElement,
-        value,
-        this.titleElement?.textContent || "",
-      );
+        this.imageElement,
+        value.src,
+        value.alt);
     }
-  }
-
-  render(data?: Partial<ICardCatalogState>): HTMLElement {
-    return super.render(data);
   }
 }

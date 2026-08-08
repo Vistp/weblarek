@@ -48,8 +48,4 @@ export class OrderForm extends Form<IOrderFormState> {
       this.addressInput.value = value;
     }
   }
-
-  render(data?: Partial<IOrderFormState>): HTMLElement {
-    return super.render(data);
-  }
 }

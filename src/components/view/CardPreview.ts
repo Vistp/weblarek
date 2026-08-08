@@ -1,4 +1,4 @@
-import { ICardPreviewState, ICardPreviewActions } from "../../types";
+import { ICardPreviewActions } from "../../types";
 import { categoryMap } from "../../utils/constants";
 import { Card } from "./Card";
 
@@ -71,9 +71,5 @@ export class CardPreview extends Card {
     if (this.actionButton && this.actionButton.textContent !== "Недоступно") {
       this.actionButton.textContent = value;
     }
-  }
-
-  render(data?: Partial<ICardPreviewState>): HTMLElement {
-    return super.render(data);
   }
 }

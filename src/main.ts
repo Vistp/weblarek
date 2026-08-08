@@ -65,7 +65,10 @@ events.on('items:changed', () => {
     card.title = product.title;
     card.price = product.price;
     card.category = product.category;
-    card.image = `${CDN_URL}${product.image}`;
+    card.image = {
+      src: `${CDN_URL}${product.image}`,
+      alt: product.title
+    }
 
     return card.render();
   });

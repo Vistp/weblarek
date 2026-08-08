@@ -71,7 +71,10 @@ export interface ICardState {
 /** Карточка каталога */
 export interface ICardCatalogState extends ICardState {
   category: string;
-  image: string;
+  image: {
+    src: string;
+    alt: string;
+  };
 }
 
 /** Карточка подробного просмотра */
