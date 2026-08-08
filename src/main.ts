@@ -29,7 +29,7 @@ const galleryContainer = document.querySelector('.gallery') as HTMLElement;
 const headerContainer = document.querySelector('.header') as HTMLElement;
 const modalContainer = document.querySelector('#modal-container') as HTMLElement;
 const cardPreviewTemplate = document.querySelector('#card-preview') as HTMLTemplateElement;
-
+const cardBasketTemplate = document.querySelector('#card-basket') as HTMLTemplateElement;
 const basketTemplate = document.querySelector('#basket') as HTMLTemplateElement;
 const successTemplate = document.querySelector('#success') as HTMLTemplateElement;
 const orderTemplate = document.querySelector('#order') as HTMLTemplateElement;
@@ -91,7 +91,10 @@ events.on('preview:changed', (product: IProduct) => {
   cardPreview.title = product.title;
   cardPreview.price = product.price;
   cardPreview.category = product.category;
-  cardPreview.image = product.image;
+  cardPreview.image = {
+    src: product.image,
+    alt: product.title
+  }
   cardPreview.text = product.description;
 
   if (product.price !== null) {
@@ -247,9 +250,7 @@ function updateBasketData() {
   const items = cart.getItems();
 
   const itemsList = items.map((product, index) => {
-    const itemTemplate = document.querySelector('#card-basket') as HTMLTemplateElement;
-    const itemFragment = itemTemplate.content.cloneNode(true) as DocumentFragment;
-    const itemContainer = itemFragment.firstElementChild as HTMLElement;
+    const itemContainer = (cardBasketTemplate.content.cloneNode(true) as DocumentFragment).firstElementChild as HTMLElement;
 
     const cardBasket = new CardBasket(itemContainer, {
        onDelete: () => {

@@ -51,12 +51,12 @@ export class CardPreview extends Card {
     }
   }
 
-  set image(value: string) {
-    if (this.imageElement) {
+  set image(value: { src: string; alt: string }) {
+    if (this.imageElement && value) {
       this.setImage(
         this.imageElement,
-        value,
-        this.titleElement?.textContent || "",
+        value.src,
+        value.alt
       );
     }
   }
