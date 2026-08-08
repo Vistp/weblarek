@@ -59,6 +59,7 @@ events.on('items:changed', () => {
     const card = new CardCatalog(cardContainer, {
       onClick: () => {
         catalog.setPreviewProduct(product);
+        events.emit('card:select', product);
       }
     });
 
@@ -66,7 +67,7 @@ events.on('items:changed', () => {
     card.price = product.price;
     card.category = product.category;
     card.image = {
-      src: `${CDN_URL}${product.image}`,
+      src: product.image,
       alt: product.title
     }
 
@@ -99,7 +100,8 @@ events.on('preview:changed', (product: IProduct) => {
   cardPreview.title = product.title;
   cardPreview.price = product.price;
   cardPreview.category = product.category;
-  cardPreview.image = `${CDN_URL}${product.image}`;
+  cardPreview.image = product.image;
+
   cardPreview.text = product.description;
 
   if (product.price !== null) {
@@ -230,7 +232,12 @@ events.on('success:close', () => {
 
 serverConnector.getProducts()
   .then((data) => {
-    catalog.setProducts(data.items);
+    const parsedProducts = data.items.map(item => ({
+      ...item,
+      image: `${CDN_URL}${item.image}`
+    }));
+
+    catalog.setProducts(parsedProducts);
   })
   .catch((error) => {
     console.error('Ошибка при получении товаров с сервера:', error);
