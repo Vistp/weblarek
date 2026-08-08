@@ -7,10 +7,10 @@ import { ServerConnector } from './components/ServerConnector';
 import { CardBasket } from './components/view/CardBasket';
 import { CardCatalog } from './components/view/CardCatalog';
 import { CardPreview } from './components/view/CardPreview';
-import { ContactsForm } from './components/view/ContactsForm';
 import { Header } from './components/view/Header';
 import { Modal } from './components/view/Modal';
-import { OrderForm } from './components/view/OrderForm';
+import { Basket } from './components/view/Basket';
+import { Success } from './components/view/Success';
 import './scss/styles.scss';
 import { IProduct, TPayment } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
@@ -27,8 +27,17 @@ const galleryContainer = document.querySelector('.gallery') as HTMLElement;
 const headerContainer = document.querySelector('.header') as HTMLElement;
 const modalContainer = document.querySelector('#modal-container') as HTMLElement;
 
+const basketTemplate = document.querySelector('#basket') as HTMLTemplateElement;
+const successTemplate = document.querySelector('#success') as HTMLTemplateElement;
+
+const basketContainer = (basketTemplate.content.cloneNode(true) as DocumentFragment).firstElementChild as HTMLElement;
+const successContainer = (successTemplate.content.cloneNode(true) as DocumentFragment).firstElementChild as HTMLElement;
+
+
 const header = new Header(headerContainer, events);
 const modal = new Modal(modalContainer, events);
+const basket = new Basket(basketContainer, events);
+const success = new Success(successContainer, events);
 
 /** Изменение каталога товаров */
 events.on('items:changed', () => {
@@ -106,13 +115,14 @@ events.on('basket:changed', () => {
   const currentModalContent = modalContainer.querySelector('.basket');
 
   if (currentModalContent) {
-    renderBasket();
+    updateBasketData();
   }
 });
 
 /** Нажатие кнопки открытия корзины */
 events.on('basket:open', () => {
-  renderBasket();
+  updateBasketData();
+  modal.content = basket.render();
   modal.open();
 });
 
@@ -120,53 +130,36 @@ events.on('basket:open', () => {
 events.on('order:open', () => {
   buyer.clearData();
 
-  const orderTemplate = document.querySelector('#order') as HTMLTemplateElement;
-  const orderFragment = orderTemplate.content.cloneNode(true) as DocumentFragment;
-  const orderContainer = orderFragment.firstElementChild as HTMLFormElement;
+  // const orderTemplate = document.querySelector('#order') as HTMLTemplateElement;
+  // const orderFragment = orderTemplate.content.cloneNode(true) as DocumentFragment;
+  // const orderContainer = orderFragment.firstElementChild as HTMLFormElement;
 
-  const orderForm = new OrderForm(orderContainer, events);
+  // const orderForm = new OrderForm(orderContainer, events);
 
-  modal.content = orderForm.render();
+  // modal.content = orderForm.render();
 });
 
 /** Изменение способа оплаты */
 events.on('order:payment-changed', (data: { method: TPayment }) => {
   buyer.setPayment(data.method);
-
-  const formElement = modalContainer.querySelector('form[name="order"]') as HTMLFormElement;
-  if (formElement) {
-    const orderForm = new OrderForm(formElement, events);
-    const errors = buyer.validate();
-    orderForm.valid = !errors.payment && !errors.address;
-    orderForm.errors = errors.payment || errors.address || '';
-    orderForm.payment = data.method;
-  }
 });
 
 /** Изменение адреса доставки */
 events.on('order:input-changed', (data: { field: string; value: string }) => {
   if (data.field === 'address') {
     buyer.setAddress(data.value);
-
-    const formElement = modalContainer.querySelector('form[name="order"]') as HTMLFormElement;
-    if (formElement) {
-      const orderForm = new OrderForm(formElement, events);
-      const errors = buyer.validate();
-      orderForm.valid = !errors.payment && !errors.address;
-      orderForm.errors = errors.payment || errors.address || '';
-    }
   }
 });
 
 /** Нажатие кнопки перехода ко второй форме оформления заказа */
 events.on('order:submit', () => {
-  const contactsTemplate = document.querySelector('#contacts') as HTMLTemplateElement;
-  const contactsFragment = contactsTemplate.content.cloneNode(true) as DocumentFragment;
-  const contactsContainer = contactsFragment.firstElementChild as HTMLFormElement;
+  // const contactsTemplate = document.querySelector('#contacts') as HTMLTemplateElement;
+  // const contactsFragment = contactsTemplate.content.cloneNode(true) as DocumentFragment;
+  // const contactsContainer = contactsFragment.firstElementChild as HTMLFormElement;
 
-  const contactsForm = new ContactsForm(contactsContainer, events);
+  // const contactsForm = new ContactsForm(contactsContainer, events);
 
-  modal.content = contactsForm.render();
+  // modal.content = contactsForm.render();
 });
 
 /** Изменение данных формы email и телефон */
@@ -175,14 +168,6 @@ events.on('contacts:input-changed', (data: { field: string; value: string }) => 
     buyer.setEmail(data.value);
   } else if (data.field === 'phone') {
     buyer.setPhone(data.value);
-  }
-
-  const formElement = modalContainer.querySelector('form[name="contacts"]') as HTMLFormElement;
-  if (formElement) {
-    const contactsForm = new ContactsForm(formElement, events);
-    const errors = buyer.validate();
-
-    contactsForm.valid = !errors.email && !errors.phone;
   }
 });
 
@@ -196,24 +181,7 @@ events.on('contacts:submit', () => {
 
   serverConnector.postOrder(orderData)
     .then((result) => {
-      const successTemplate = document.querySelector('#success') as HTMLTemplateElement;
-      const successFragment = successTemplate.content.cloneNode(true) as DocumentFragment;
-      const successContainer = successFragment.firstElementChild as HTMLElement;
-
-      const descriptionElement = successContainer.querySelector('.order-success__description') as HTMLElement;
-      const closeButton = successContainer.querySelector('.order-success__close') as HTMLButtonElement;
-
-      if (descriptionElement) {
-        descriptionElement.textContent = `Списано ${result.total} синапсов`;
-      }
-
-      if (closeButton) {
-        closeButton.addEventListener('click', () => {
-          modal.close();
-        });
-      }
-
-      modal.content = successContainer;
+      modal.content = success.render({ total: result.total });
 
       cart.clear();
       buyer.clearData();
@@ -221,6 +189,11 @@ events.on('contacts:submit', () => {
     .catch((error) => {
       console.error('Ошибка при отправке заказа:', error);
     });
+});
+
+/** Закрытие окна успешного заказа */
+events.on('success:close', () => {
+  modal.close();
 });
 
 serverConnector.getProducts()
@@ -231,19 +204,10 @@ serverConnector.getProducts()
     console.error('Ошибка при получении товаров с сервера:', error);
   });
 
-
 /**
- * Отрисовка содержимого корзины
+ * Оновление данных внутри корзины
  */
-const renderBasket = () => {
-  const basketTemplate = document.querySelector('#basket') as HTMLTemplateElement;
-  const basketFragment = basketTemplate.content.cloneNode(true) as DocumentFragment;
-  const basketContainer = basketFragment.firstElementChild as HTMLElement;
-
-  const basketListElement = basketContainer.querySelector('.basket__list') as HTMLElement;
-  const basketPriceElement = basketContainer.querySelector('.basket__price') as HTMLElement;
-  const basketButton = basketContainer.querySelector('.basket__button') as HTMLButtonElement;
-
+function updateBasketData() {
   const items = cart.getItems();
 
   const itemsList = items.map((product, index) => {
@@ -264,15 +228,6 @@ const renderBasket = () => {
     return cardBasket.render();
   });
 
-  basketListElement.replaceChildren(...itemsList);
-  basketPriceElement.textContent = `${cart.getTotalPrice()} синапсов`;
-
-  if (basketButton) {
-    basketButton.disabled = items.length === 0;
-    basketButton.addEventListener('click', () => {
-      events.emit('order:open');
-    });
-  }
-
-  modal.content = basketContainer;
-};
+  basket.items = itemsList;
+  basket.total = cart.getTotalPrice();
+}
