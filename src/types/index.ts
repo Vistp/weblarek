@@ -126,7 +126,7 @@ export interface ISuccessState {
 
 /** Действия для карточки в каталоге товаров */
 export interface ICardActions {
-  onClick: (event: MouseEvent) => void;
+  onClick?: (event: MouseEvent) => void;
 }
 
 /** Действия для карточки подробного просмотра */

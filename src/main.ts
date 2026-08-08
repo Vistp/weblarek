@@ -28,6 +28,7 @@ const buyer = new Buyer(events);
 const galleryContainer = document.querySelector('.gallery') as HTMLElement;
 const headerContainer = document.querySelector('.header') as HTMLElement;
 const modalContainer = document.querySelector('#modal-container') as HTMLElement;
+const cardPreviewTemplate = document.querySelector('#card-preview') as HTMLTemplateElement;
 
 const basketTemplate = document.querySelector('#basket') as HTMLTemplateElement;
 const successTemplate = document.querySelector('#success') as HTMLTemplateElement;
@@ -38,7 +39,7 @@ const basketContainer = (basketTemplate.content.cloneNode(true) as DocumentFragm
 const successContainer = (successTemplate.content.cloneNode(true) as DocumentFragment).firstElementChild as HTMLElement;
 const orderContainer = (orderTemplate.content.cloneNode(true) as DocumentFragment).firstElementChild as HTMLFormElement;
 const contactsContainer = (contactsTemplate.content.cloneNode(true) as DocumentFragment).firstElementChild as HTMLFormElement;
-
+const cardPreviewContainer = (cardPreviewTemplate.content.cloneNode(true) as DocumentFragment).firstElementChild as HTMLElement;
 
 const header = new Header(headerContainer, events);
 const modal = new Modal(modalContainer, events);
@@ -46,6 +47,14 @@ const basket = new Basket(basketContainer, events);
 const success = new Success(successContainer, events);
 const orderForm = new OrderForm(orderContainer, events);
 const contactsForm = new ContactsForm(contactsContainer, events);
+const cardPreview = new CardPreview(cardPreviewContainer, {
+  onAction: () => {
+    const currentProduct = catalog.getPreviewProduct();
+    if (currentProduct) {
+      events.emit('preview:toggle-cart', currentProduct);
+    }
+  }
+});
 
 /** Изменение каталога товаров */
 events.on('items:changed', () => {
@@ -79,29 +88,10 @@ events.on('items:changed', () => {
 
 /** Изменение выбранного для просмотра товара */
 events.on('preview:changed', (product: IProduct) => {
-  const cardPreviewTemplate = document.querySelector('#card-preview') as HTMLTemplateElement;
-  const cardPreviewFragment = cardPreviewTemplate.content.cloneNode(true) as DocumentFragment;
-  const cardPreviewContainer = cardPreviewFragment.firstElementChild as HTMLElement;
-
-  const cardPreview = new CardPreview(cardPreviewContainer, {
-    onClick: () => {},
-    onAction: () => {
-      if (cart.checkInCart(product.id)) {
-        cart.remove(product.id);
-      } else {
-        if (product.price !== null) {
-          cart.add(product);
-        }
-      }
-      modal.close();
-    }
-  });
-
   cardPreview.title = product.title;
   cardPreview.price = product.price;
   cardPreview.category = product.category;
   cardPreview.image = product.image;
-
   cardPreview.text = product.description;
 
   if (product.price !== null) {
@@ -120,6 +110,17 @@ events.on('card:add-to-cart', (product: IProduct) => {
   modal.close();
 });
 
+/**Нажатие кнопки удаления из корзины из окна просмотра товара */
+events.on('preview:toggle-cart', (product: IProduct) => {
+  if (cart.checkInCart(product.id)) {
+    cart.remove(product.id);
+  } else {
+    if (product.price !== null) {
+      cart.add(product);
+    }
+  }
+  modal.close();
+});
 
 /** Изменение содержимого корзины */
 events.on('basket:changed', () => {
